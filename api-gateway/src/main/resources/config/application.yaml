@@ -1,0 +1,20 @@
+server:
+  port: 8085 # Setting the port for the API Gateway
+
+spring:
+  application:
+    name: api-gateway-service # Name of the Spring Boot application
+
+  cloud:
+    gateway:
+      routes:
+        - id: order-service # ID for the route
+          uri: http://localhost:8081 # Target URI for the route (order service)
+          predicates:
+            - Path=/api/orders/** # Predicate to match requests for orders
+            - Path=/order-items/** # Predicate to match requests for order items
+
+      discovery:
+        client:
+          service-url:
+            defaultZone: http://localhost:8761/ # Eureka Discovery Server URL
