@@ -29,7 +29,6 @@ public class Order {
 
     private double totalAmount;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 

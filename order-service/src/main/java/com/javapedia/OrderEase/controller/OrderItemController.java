@@ -26,7 +26,7 @@ public class OrderItemController {
         return new ResponseEntity<>(orderItemService.createOrderItem(orderItem), HttpStatus.CREATED);
     }
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<OrderItem> updateOrderItem(@RequestBody OrderItem orderItem) throws OrderItemNotFoundException {
         return new ResponseEntity<>(orderItemService.updateOrderItem(orderItem), HttpStatus.CREATED);
     }

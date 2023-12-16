@@ -24,19 +24,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createOrder(Order order) throws ProductNotFoundException {
-        if (order.getOrderItems() == null || order.getOrderItems().isEmpty()) {
-            throw new IllegalArgumentException("Order items cannot be null or empty");
-        }
-
-        for (OrderItem item : order.getOrderItems()) {
-            Product product = productServiceDelegate.getProductById(item.getProductId());
-
-            if (product == null) {
-                throw new ProductNotFoundException("Product with ID " + item.getProductId() + " not found");
-            }
-
-            item.setPrice(product.getPrice());
-        }
 
         return orderRepository.save(order);
     }
@@ -110,8 +97,8 @@ public class OrderServiceImpl implements OrderService {
             Order order = optionalOrder.get();
 
             // Check if the order can be canceled (based on status, business logic, etc.)
-            if (order.getStatus() == OrderStatus.pending || order.getStatus() == OrderStatus.processing) {
-                order.setStatus(OrderStatus.cancelled);
+            if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.PROCESSING) {
+                order.setStatus(OrderStatus.CANCELLED);
                 orderRepository.save(order);
                 return true;
             } else {
