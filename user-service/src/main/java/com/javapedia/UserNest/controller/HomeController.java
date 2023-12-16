@@ -22,7 +22,7 @@
     import java.util.Collections;
 
     @RestController
-    @RequestMapping("/api")
+    @RequestMapping("/api/user")
     public class HomeController {
         @Autowired
         private AuthenticationManager authenticationManager;
