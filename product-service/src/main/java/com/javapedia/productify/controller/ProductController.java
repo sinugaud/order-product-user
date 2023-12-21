@@ -4,6 +4,7 @@ import com.javapedia.productify.exeptions.OrderItemNotFoundException;
 import com.javapedia.productify.model.Product;
 import com.javapedia.productify.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
+@RefreshScope
+
 public class ProductController {
 
     private final ProductService productService;

@@ -3,6 +3,7 @@ package com.javapedia.config;
 import com.javapedia.fillter.JwtAuthFilter;
 import com.javapedia.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -30,6 +31,7 @@ public class SecurityConfig {
 
     // User Creation
     @Bean
+
     public UserDetailsService userDetailsService() {
         return new UserInfoService();
     }

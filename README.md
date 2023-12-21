@@ -64,5 +64,6 @@ This service handles user authentication.
 ## Additional Implementations
 
 - **Config Server**: Configuration server setup.
-- **API Gateway**: Implementation of an API gateway.
+- **API Gateway**: Run the gateway service and you access all the service in one port  api gateway running on port number 8085.
+   suppose we want to access order-service  http://localhost:8085/ORDER_SERVICE/api/orders
 

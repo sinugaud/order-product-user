@@ -9,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +26,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/auth")
+@RefreshScope
 public class UserController {
 
     @Autowired
@@ -106,7 +108,7 @@ public class UserController {
     public ResponseEntity<String> getUsernameFromToken(@RequestHeader("Authorization") String jwtToken) {
 
         try {
-            System.out.println("jwt token from user service"+jwtToke);
+            System.out.println("jwt token from user service"+jwtToken);
             jwtToken = jwtToken.substring(7);
 
             String username = jwtService.extractUsername(jwtToken);
