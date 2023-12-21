@@ -20,7 +20,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String userId;
+    private String username;
 
     private LocalDate date = LocalDate.now();
 

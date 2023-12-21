@@ -6,6 +6,7 @@ import com.javapedia.OrderEase.model.Order;
 import com.javapedia.OrderEase.model.OrderItem;
 import com.javapedia.OrderEase.repository.OrderRepository;
 import com.javapedia.OrderEase.service.OrderService;
+import com.javapedia.OrderEase.service.UserService;
 import com.javapedia.OrderEase.service.productdelegate.ProductServiceDelegate;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,19 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private ProductServiceDelegate productServiceDelegate;
+    @Autowired
+    private UserService userService;
+
+    @Override
+    public List<Order> getOrdersByUsername(String username) {
+//        System.out.println("Token in side method"+token);
+
+//        String usernameFromToken = userService.getUsernameFromToken(token);
+
+
+        return orderRepository.findByUsername(username);
+    }
+
 
     @Override
     public Order createOrder(Order order) throws ProductNotFoundException {
@@ -50,8 +64,8 @@ public class OrderServiceImpl implements OrderService {
             Order existingOrder = optionalOrder.get();
 
             // Update only if the fields are not null in the updatedOrder
-            if (updatedOrder.getUserId() != null) {
-                existingOrder.setUserId(updatedOrder.getUserId());
+            if (updatedOrder.getUsername() != null) {
+                existingOrder.setUsername(updatedOrder.getUsername());
             }
             if (updatedOrder.getDate() != null) {
                 existingOrder.setDate(updatedOrder.getDate());

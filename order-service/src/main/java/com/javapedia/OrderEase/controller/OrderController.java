@@ -6,7 +6,9 @@ import com.javapedia.OrderEase.model.Order;
 import com.javapedia.OrderEase.model.OrderItem;
 import com.javapedia.OrderEase.repository.OrderRepository;
 import com.javapedia.OrderEase.service.OrderService;
+import com.javapedia.OrderEase.service.UserService;
 import com.javapedia.OrderEase.service.implement.ProductNotFoundException;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ public class OrderController {
     private final OrderService orderService;
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private UserService userService;
 
     @Autowired
     public OrderController(OrderService orderService) {
@@ -42,12 +46,50 @@ public class OrderController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
-        Optional<Order> order = orderService.getOrderById(orderId);
-        return order.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+//    @GetMapping("/{orderId}")
+//    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId, @RequestHeader("Authorization") String token) {
+//
+//        if (userService.isUserLoggedIn(token)) {
+//            Optional<Order> order = orderService.getOrderById(orderId);
+//            return order.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+//                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+//        }
+//        return null;
+//    }
+//    @GetMapping("/{orderId}")
+//    public ResponseEntity<?> getOrderById(@PathVariable Long orderId, @RequestHeader("Authorization") String token) {
+//        if (userService.isUserLoggedIn(token)) {
+//            Optional<Order> order = orderService.getOrderById(orderId);
+//            if (order.isPresent()) {
+//                return ResponseEntity.ok(order.get());
+//            } else {
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+//            }
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
+//        }
+//    }
+@GetMapping("/{orderId}")
+public ResponseEntity<?> getOrderById(@PathVariable Long orderId, @RequestHeader("Authorization") String token) {
+    try {
+        if (userService.isUserLoggedIn(token)) {
+            Optional<Order> order = orderService.getOrderById(orderId);
+            if (order.isPresent()) {
+                return ResponseEntity.ok(order.get());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
+        }
+    } catch (FeignException.Forbidden e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access: Token invalid or expired");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
     }
+}
+
+
 
     @PostMapping
     public ResponseEntity<Order> createOrder(@RequestBody Order order) throws ProductNotFoundException {
@@ -86,7 +128,7 @@ public class OrderController {
     }
 
     @GetMapping("/order-item/{orderId}/{productId}")
-    public Order addItemToOrder(@PathVariable Long orderId,@PathVariable Long productId, Double quantity) throws ProductNotFoundException {
+    public Order addItemToOrder(@PathVariable Long orderId, @PathVariable Long productId, Double quantity) throws ProductNotFoundException {
         Order order = orderService.getOrderById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
 
@@ -108,6 +150,36 @@ public class OrderController {
 
         return orderRepository.save(order);
     }
+
+    @GetMapping("/logged/orders")
+    public ResponseEntity<List<Order>> getOrdersByToken(@RequestHeader("Authorization") String token) {
+        try {
+            // Log token for debugging
+            System.out.println("Received Token: " + token);
+
+            if (userService.isUserLoggedIn(token)) {
+                String username = userService.getUsernameFromToken(token);
+                System.out.println("Extracted Username: " + username);
+
+                List<Order> orders = orderService.getOrdersByUsername(username);
+                System.out.println("Orders retrieved: " + orders.size());
+
+                return ResponseEntity.ok(orders);
+            } else {
+                System.out.println("User not logged in");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
+        } catch (FeignException.Forbidden e) {
+            System.out.println("Forbidden Exception: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            System.out.println("Error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+
 }
 
 

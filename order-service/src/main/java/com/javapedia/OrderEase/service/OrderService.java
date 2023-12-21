@@ -18,6 +18,8 @@ public interface OrderService {
     Order updateOrderStatus(Long orderId, String newStatus);
 
     boolean cancelOrder(Long orderId);
+     List<Order> getOrdersByUsername(String username) ;
 
-}
+
+    }
 
