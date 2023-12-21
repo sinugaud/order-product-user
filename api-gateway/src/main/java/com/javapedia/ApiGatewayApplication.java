@@ -22,8 +22,8 @@ public class ApiGatewayApplication {
         SpringApplication.run(ApiGatewayApplication.class, args);
     }
 
-    @Autowired
-    RouteDefinitionLocator locator;
+//    @Autowired
+//    RouteDefinitionLocator locator;
 
 //	@Bean
 //	public List<GroupedOpenApi> apis() {
@@ -38,14 +38,14 @@ public class ApiGatewayApplication {
 //	}
 
 
-    @Bean
-    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-        return builder.routes()
-                .route("r1", r -> r.host("**-service")
-                        .and()
-                        .path("/api/orders")
-                        .uri("http://baeldung.com"))
-
-                .build();
-    }
+//    @Bean
+//    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+//        return builder.routes()
+//                .route("r1", r -> r.host("**-service")
+//                        .and()
+//                        .path("/api/orders")
+//                        .uri("http://baeldung.com"))
+//
+//                .build();
+//    }
 }
