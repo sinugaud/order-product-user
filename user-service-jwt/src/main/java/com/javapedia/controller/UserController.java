@@ -4,10 +4,7 @@ import com.javapedia.entity.AuthRequest;
 import com.javapedia.entity.UserInfo;
 import com.javapedia.service.JwtService;
 import com.javapedia.service.UserInfoService;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
@@ -27,6 +24,9 @@ import java.util.Set;
 @RestController
 @RequestMapping("/auth")
 @RefreshScope
+@CrossOrigin("*") //
+@Log4j2
+//@CrossOrigin(origins = "http://example.com", maxAge = 3600)
 public class UserController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class UserController {
         return "Welcome this endpoint is not secure";
     }
 
-    @PostMapping("/addNewUser")
+        @PostMapping("/addNewUser")
     public String addNewUser(@RequestBody UserInfo userInfo) {
         return service.addUser(userInfo);
     }
@@ -62,15 +62,37 @@ public class UserController {
         return "Welcome to Admin Profile";
     }
 
+//    @PostMapping("/generateToken")
+//    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+//        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+//        if (authentication.isAuthenticated()) {
+//            return jwtService.generateToken(authRequest.getUsername());
+//        } else {
+//            throw new UsernameNotFoundException("invalid user request !");
+//        }
+//    }
+
     @PostMapping("/generateToken")
     public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        log.info("Auth request : {}",authRequest);
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+
+        );
+        log.info("Authentication : {}",authentication);
+
+
         if (authentication.isAuthenticated()) {
+            // Generate a JWT token for the authenticated user
             return jwtService.generateToken(authRequest.getUsername());
         } else {
-            throw new UsernameNotFoundException("invalid user request !");
+            throw new UsernameNotFoundException("Invalid user request!");
         }
     }
+
+
+
 
     @GetMapping("/token/validate")
     public ResponseEntity<Boolean> isTokenValid(@RequestHeader("Authorization") String jwtToken) {

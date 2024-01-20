@@ -11,7 +11,6 @@
         private UserClient userClient;
         @Override
         public boolean isUserLoggedIn(String token) {
-
             return userClient.isTokenValid(token);
         }
 

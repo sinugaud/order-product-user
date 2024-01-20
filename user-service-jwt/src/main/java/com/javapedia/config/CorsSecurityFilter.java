@@ -1,4 +1,4 @@
-package com.javapedia;
+package com.javapedia.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,8 +19,10 @@ public class CorsSecurityFilter extends OncePerRequestFilter {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
 		response.setHeader("Access-Control-Max-Age", "3600");
-		response.setHeader("Access-Control-Allow-Headers", "authorization, content-type, xsrf-token");
+		response.setHeader("Access-Control-Allow-Headers", "authorization, Authorization,content-type, xsrf-token");
 		response.addHeader("Access-Control-Expose-Headers", "xsrf-token");
+		response.setHeader("Access-Control-Allow-Origin", "*");
+
 		if ("OPTIONS".equals(request.getMethod())) {
 			response.setStatus(HttpServletResponse.SC_OK);
 		} else {

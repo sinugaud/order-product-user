@@ -21,12 +21,12 @@ public class Order {
     private Long id;
 
     private String username;
-
+    @JsonIgnore
     private LocalDate date = LocalDate.now();
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-
+    @Column(name = "total_amount")
     private double totalAmount;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)

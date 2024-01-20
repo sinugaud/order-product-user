@@ -34,13 +34,21 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.findByUsername(username);
     }
-
-
     @Override
+    public List<Order> getAllOrdersByUsername(String token) {
+        String username = userService.getUsernameFromToken(token);
+        return orderRepository.findAllByUsername(username);
+
+    }
+
+
+
+        @Override
     public Order createOrder(Order order) throws ProductNotFoundException {
 
         return orderRepository.save(order);
     }
+
 
     @Override
     public List<Order> getAllOrders() {

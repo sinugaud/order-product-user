@@ -14,4 +14,6 @@ public class Product {
     private String description;
     private double price;
 
+    public Product(Long id, String unavailableProduct) {
+    }
 }

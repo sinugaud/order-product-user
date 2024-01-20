@@ -8,8 +8,10 @@ import java.util.Optional;
 
 public interface OrderService {
     Order createOrder(Order order) throws ProductNotFoundException;
+     List<Order> getAllOrdersByUsername(String token) ;
 
-    List<Order> getAllOrders();
+
+        List<Order> getAllOrders();
 
     Optional<Order> getOrderById(Long orderId);
 
