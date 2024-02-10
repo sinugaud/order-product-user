@@ -29,22 +29,19 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter authFilter;
 
-    // User Creation
     @Bean
-
     public UserDetailsService userDetailsService() {
         return new UserInfoService();
     }
 
-    // Configuring HttpSecurity
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers("/auth/welcome","/auth/token/validate", "/auth/addNewUser", "/auth/generateToken","/auth/logout","/auth/logged/username").permitAll().
-                                requestMatchers("/auth/user/**").authenticated().
-                                requestMatchers("/auth/admin/**").authenticated());
+                        req.requestMatchers("/welcome","/token/validate", "/sign-up", "/login","/auth/logout","/logged/username").permitAll().
+                                requestMatchers("/user/**").authenticated().
+                                requestMatchers("/admin/**").authenticated());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);

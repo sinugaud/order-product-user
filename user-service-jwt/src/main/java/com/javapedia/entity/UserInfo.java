@@ -21,6 +21,7 @@ public class UserInfo {
 	private String username;
 	private String email; 
 	private String password; 
-	private String roles; 
+	private String roles;
+	private Byte displayPicture;
 
 } 

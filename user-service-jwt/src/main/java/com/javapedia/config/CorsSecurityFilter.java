@@ -15,14 +15,12 @@ import java.io.IOException;
 public class CorsSecurityFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-		logger.info("Cors filter executing");
+//		logger.info("Cors filter executing");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
 		response.setHeader("Access-Control-Max-Age", "3600");
-		response.setHeader("Access-Control-Allow-Headers", "authorization, Authorization,content-type, xsrf-token");
+		response.setHeader("Access-Control-Allow-Headers", "authorization, content-type, xsrf-token");
 		response.addHeader("Access-Control-Expose-Headers", "xsrf-token");
-		response.setHeader("Access-Control-Allow-Origin", "*");
-
 		if ("OPTIONS".equals(request.getMethod())) {
 			response.setStatus(HttpServletResponse.SC_OK);
 		} else {
