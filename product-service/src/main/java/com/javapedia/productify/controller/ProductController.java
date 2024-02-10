@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/products")
 @RefreshScope
-
 public class ProductController {
 
     private final ProductService productService;
@@ -37,8 +36,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct( @RequestBody Product product) throws OrderItemNotFoundException {
-        Product createdProduct = productService.createProduct(product);
+    public ResponseEntity<Product> addProduct( @RequestBody Product product) throws OrderItemNotFoundException {
+        Product createdProduct = productService.addProduct(product);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
 

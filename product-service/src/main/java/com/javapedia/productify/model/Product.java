@@ -12,9 +12,11 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String imageuri;
     private String name;
     private String description;
     private double price;
     private double quantity;
+//    private long cartId;
 
 }

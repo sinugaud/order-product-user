@@ -1,23 +1,29 @@
 package com.javapedia.productify.service.impl;
 
-import com.javapedia.productify.dto.OrderItemDto;
+import com.javapedia.productify.client.OrderServiceClient;
+import com.javapedia.productify.dto.OrderDTO;
+import com.javapedia.productify.dto.OrderItem;
 import com.javapedia.productify.exeptions.OrderItemNotFoundException;
 import com.javapedia.productify.exeptions.ResourceNotFoundException;
 import com.javapedia.productify.model.Product;
 import com.javapedia.productify.repository.ProductRepository;
 import com.javapedia.productify.service.OrderItemDelegateService;
 import com.javapedia.productify.service.ProductService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Log4j2
 public class ProductServiceImpl implements ProductService {
     @Autowired
     private final ProductRepository productRepository;
     @Autowired
     OrderItemDelegateService orderItemDelegateService;
+    @Autowired
+    private OrderServiceClient orderServiceClient;
 
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository) {
@@ -36,14 +42,10 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public Product createProduct(Product product) throws OrderItemNotFoundException {
-        Product saveProduct = productRepository.save(product);
-        OrderItemDto orderItemDto = new OrderItemDto();
-        orderItemDto.setProductId(product.getId());
-        orderItemDto.setQuantity(product.getQuantity());
-        orderItemDelegateService.updateOrderItem(orderItemDto);
+    public Product addProduct(Product product) throws OrderItemNotFoundException {
+        return productRepository.save(product);
 
-        return saveProduct;
+
     }
 
     @Override
@@ -53,4 +55,42 @@ public class ProductServiceImpl implements ProductService {
 
         productRepository.delete(existingProduct);
     }
+
+    @Override
+    public void processOrderPlacedEvent(Long orderId) throws InsufficientProductQuantityException {
+        // Fetch order details from an OrderDTO service through API or event
+       log.info("order place event");
+        OrderDTO orderDto = orderServiceClient.getOrderById(orderId);
+        log.info("Order dto :{}",orderDto);
+
+        // Process order items and update products
+        for (OrderItem orderItem : orderDto.getOrderItems()) {
+            Long productId = orderItem.getProductId();
+            Double quantity = orderItem.getQuantity();
+
+            // Fetch product details from your ProductService
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with id ,{}" + productId));
+            log.info("product  from event find by id {},", product);
+            // Update the product quantity or perform any other relevant action
+            double remainingQuantity = (product.getQuantity() - quantity);
+            log.info(" quantity {}",quantity);
+
+//            if (remainingQuantity >= 0) {
+                product.setQuantity(remainingQuantity);
+                log.info("remaining quantity {}",remainingQuantity);
+
+                productRepository.save(product);
+                log.info("product update Successfully {}",product.getId());
+//            } else {
+//                // Handle insufficient quantity scenario
+//                // You might also want to implement compensation actions if needed
+//                log.info("product not update Successfully {}",product.getId());
+
+                throw new InsufficientProductQuantityException("Insufficient quantity for product with id " + productId);
+//            }
+        }
+
+    }
+
 }
