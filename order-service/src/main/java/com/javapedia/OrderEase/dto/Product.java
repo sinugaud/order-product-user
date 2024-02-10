@@ -13,6 +13,7 @@ public class Product {
     private String name;
     private String description;
     private double price;
+    private Long cartId;
 
     public Product(Long id, String unavailableProduct) {
     }

@@ -1,14 +1,20 @@
 package com.javapedia.OrderEase.service.implement;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javapedia.OrderEase.Enum.OrderStatus;
-import com.javapedia.OrderEase.dto.Product;
+import com.javapedia.OrderEase.dto.OrderPlacedEventDTO;
 import com.javapedia.OrderEase.model.Order;
 import com.javapedia.OrderEase.model.OrderItem;
+import com.javapedia.OrderEase.repository.OrderItemRepository;
 import com.javapedia.OrderEase.repository.OrderRepository;
 import com.javapedia.OrderEase.service.OrderService;
 import com.javapedia.OrderEase.service.UserService;
 import com.javapedia.OrderEase.service.productdelegate.ProductServiceDelegate;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +30,13 @@ public class OrderServiceImpl implements OrderService {
     private ProductServiceDelegate productServiceDelegate;
     @Autowired
     private UserService userService;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    ObjectMapper objectMapper;
+
 
     @Override
     public List<Order> getOrdersByUsername(String username) {
@@ -34,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.findByUsername(username);
     }
+
     @Override
     public List<Order> getAllOrdersByUsername(String token) {
         String username = userService.getUsernameFromToken(token);
@@ -41,12 +55,56 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    @Override
+    public Optional<Order> getOrderById(Long id) {
+        // Retrieve the order by ID
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        log.info("Order by id {} {}", id, optionalOrder);
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            List<OrderItem> orderItems = orderItemRepository.findByOrder(order);
+            log.info("OrderItem by order {} ", orderItems);
+            order.setOrderItems(orderItems);
+            log.info("Order after fetching OrderItem{} ", order);
+
+        }
+        return optionalOrder;
+    }
 
 
-        @Override
-    public Order createOrder(Order order) throws ProductNotFoundException {
+    @Override
+    public Order placeOrder(Order order) throws ProductNotFoundException {
+        Order savedOrder = orderRepository.save(order);
+        for (OrderItem orderItem : order.getOrderItems()) {
+            orderItem.setOrder(savedOrder);
+            orderItemRepository.save(orderItem);
+        }
 
-        return orderRepository.save(order);
+
+        // Create OrderPlacedEventDTO with the saved order ID
+        OrderPlacedEventDTO orderPlacedEventDTO = new OrderPlacedEventDTO(savedOrder.getId());
+
+        // Create message properties and set content type
+        MessageProperties messageProperties = new MessageProperties();
+        messageProperties.setContentType("application/json");
+
+        try {
+            // Serialize OrderPlacedEventDTO to byte array
+            byte[] messageBody = objectMapper.writeValueAsBytes(orderPlacedEventDTO);
+
+            // Create a RabbitMQ message
+            Message message = new Message(messageBody, messageProperties);
+
+            // Send the message to the specified exchange and routing key
+            rabbitTemplate.convertAndSend("order-exchange", "order.placed", message);
+
+            log.info("Order placed event sent to RabbitMQ: {}", orderPlacedEventDTO);
+        } catch (JsonProcessingException e) {
+            log.error("Error serializing OrderPlacedEventDTO", e);
+            // Handle the exception as needed
+        }
+
+        return savedOrder;
     }
 
 
@@ -56,14 +114,6 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    @Override
-    public Optional<Order> getOrderById(Long orderId) {
-        Optional<Order> existingOrder = Optional.of(orderRepository.findById(orderId).orElseThrow());
-
-        Order order = existingOrder.get();
-        return Optional.of(order);
-
-    }
 
     @Override
     public Order updateOrder(Long orderId, Order updatedOrder) {
@@ -102,12 +152,11 @@ public class OrderServiceImpl implements OrderService {
         if (optionalOrder.isPresent()) {
             Order existingOrder = optionalOrder.get();
 
-            // Assuming OrderStatus is an Enum and 'OrderStatus.valueOf(newStatus)' converts string to Enum
             existingOrder.setStatus(OrderStatus.valueOf(newStatus)); // Assuming Enum names match the input string
 
             return orderRepository.save(existingOrder);
         } else {
-            return null; // Or you might throw an exception to handle the scenario where the order is not found
+            return null;
         }
     }
 
@@ -129,7 +178,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
 
-        return false; // Order not found
+        return false;
     }
 
 
