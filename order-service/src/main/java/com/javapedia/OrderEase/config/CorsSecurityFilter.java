@@ -1,4 +1,4 @@
-package com.javapedia.OrderEase;
+package com.javapedia.OrderEase.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

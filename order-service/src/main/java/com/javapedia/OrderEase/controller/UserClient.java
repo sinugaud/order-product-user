@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(value = "USER-SERVICE", url = "http://localhost:8083/auth/")
+@FeignClient(value = "USER-SERVICE", url = "http://localhost:8083/")
+//@FeignClient(value = "USER-SERVICE")
 public interface UserClient {
 
     @GetMapping("/welcome")
@@ -23,7 +24,7 @@ public interface UserClient {
     String adminProfile();
 
 
-    @PostMapping("/generateToken")
+    @PostMapping("/login")
     String authenticateAndGetToken(@RequestBody AuthRequestDTO authRequest);
 
 

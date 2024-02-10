@@ -69,49 +69,46 @@ public class OrderController {
         }
     }
 
-
-    //    @GetMapping("/{orderId}")
-//    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId, @RequestHeader("Authorization") String token) {
-//
-//        if (userService.isUserLoggedIn(token)) {
-//            Optional<Order> order = orderService.getOrderById(orderId);
-//            return order.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-//                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-//        }
-//        return null;
-//    }
 //    @GetMapping("/{orderId}")
 //    public ResponseEntity<?> getOrderById(@PathVariable Long orderId, @RequestHeader("Authorization") String token) {
-//        if (userService.isUserLoggedIn(token)) {
-//            Optional<Order> order = orderService.getOrderById(orderId);
-//            if (order.isPresent()) {
-//                return ResponseEntity.ok(order.get());
+//        try {
+//            if (userService.isUserLoggedIn(token)) {
+//                Optional<Order> order = orderService.getOrderById(orderId);
+//                if (order.isPresent()) {
+//                    return ResponseEntity.ok(order.get());
+//                } else {
+//                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+//                }
 //            } else {
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
 //            }
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
+//        } catch (FeignException.Forbidden e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access: Token invalid or expired");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
 //        }
 //    }
+
     @GetMapping("/{orderId}")
-    public ResponseEntity<?> getOrderById(@PathVariable Long orderId, @RequestHeader("Authorization") String token) {
-        try {
-            if (userService.isUserLoggedIn(token)) {
+    public ResponseEntity<?> getOrderById(@PathVariable Long orderId ) {
+//        try {
+//            if (userService.isUserLoggedIn(token)) {
                 Optional<Order> order = orderService.getOrderById(orderId);
                 if (order.isPresent()) {
                     return ResponseEntity.ok(order.get());
                 } else {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
                 }
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
-            }
-        } catch (FeignException.Forbidden e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access: Token invalid or expired");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
+//            }
+//        else {
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
+//            }
+//        } catch (FeignException.Forbidden e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access: Token invalid or expired");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
         }
-    }
+//    }
 
 
     @PostMapping
@@ -121,7 +118,7 @@ public class OrderController {
             log.info("Received Token: {}", token);
 
             if (userService.isUserLoggedIn(token)) {
-                Order createdOrder = orderService.createOrder(order);
+                Order createdOrder = orderService.placeOrder(order);
                 return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
             } else {
                 log.info("User not logged in");
@@ -204,29 +201,29 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/order-item/{orderId}/{productId}")
-    public Order addItemToOrder(@PathVariable Long orderId, @PathVariable Long productId, Double quantity) throws ProductNotFoundException {
-        Order order = orderService.getOrderById(orderId)
-                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
-
-        // Retrieve product details from Product Service using its API
-        Product product = productClient.getProductById(productId);
-
-        OrderItem orderItem = new OrderItem();
-        orderItem.setOrder(order);
-        orderItem.setProductId(productId); // Set the Product ID
-        orderItem.setQuantity(2.0);
-        orderItem.setPrice(product.getPrice()); // Set price or any other details from the product
-
-        order.getOrderItems().add(orderItem);
-
-        // Recalculate total amount for the order
-        double totalAmount = order.getOrderItems().stream()
-                .mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
-        order.setTotalAmount(totalAmount);
-
-        return orderRepository.save(order);
-    }
+//    @GetMapping("/order-item/{orderId}/{productId}")
+//    public Order addItemToOrder(@PathVariable Long orderId, @PathVariable Long productId, Double quantity) throws ProductNotFoundException {
+//        Order order = orderService.getOrderById(orderId)
+//                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+//
+//        // Retrieve product details from Product Service using its API
+//        Product product = productClient.getProductById(productId);
+//
+//        OrderItem orderItem = new OrderItem();
+//        orderItem.setOrder(order);
+//        orderItem.setProductId(productId); // Set the Product ID
+//        orderItem.setQuantity(2.0);
+//        orderItem.setPrice(product.getPrice()); // Set price or any other details from the product
+//
+//        order.getOrderItems().add(orderItem);
+//
+//        // Recalculate total amount for the order
+//        double totalAmount = order.getOrderItems().stream()
+//                .mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+//        order.setTotalAmount(totalAmount);
+//
+//        return orderRepository.save(order);
+//    }
 
     @GetMapping("/logged/orders")
     public ResponseEntity<List<Order>> getOrdersByLoggedInUser(@RequestHeader("Authorization") String token) {

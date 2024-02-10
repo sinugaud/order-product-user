@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
-    Order createOrder(Order order) throws ProductNotFoundException;
-     List<Order> getAllOrdersByUsername(String token) ;
+    Order placeOrder(Order order) throws ProductNotFoundException;
+
+    List<Order> getAllOrdersByUsername(String token);
 
 
-        List<Order> getAllOrders();
+    List<Order> getAllOrders();
 
     Optional<Order> getOrderById(Long orderId);
 
@@ -20,8 +21,9 @@ public interface OrderService {
     Order updateOrderStatus(Long orderId, String newStatus);
 
     boolean cancelOrder(Long orderId);
-     List<Order> getOrdersByUsername(String username) ;
+
+    List<Order> getOrdersByUsername(String username);
 
 
-    }
+}
 
