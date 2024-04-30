@@ -26,8 +26,7 @@ public class OrderItem implements Serializable {
     private double price;
     @ManyToOne
     @JoinColumn(name = "order_id")
-    @JsonIgnore // Add this annotation to break the circular reference
-
+    @JsonIgnore
     private Order order;
 
 }

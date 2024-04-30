@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +17,7 @@ public class ProductServiceController {
 
 
     @GetMapping("/product")
-    public ResponseEntity<List<Product>> getAllproduct() {
+    public ResponseEntity<List<Product>> getAllProduct() {
         List<Product> products = productClient.getAllProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);
     }

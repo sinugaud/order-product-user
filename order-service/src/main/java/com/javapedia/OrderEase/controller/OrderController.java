@@ -11,6 +11,7 @@ import com.javapedia.OrderEase.service.implement.ProductNotFoundException;
 import feign.FeignException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,31 +44,45 @@ public class OrderController {
 //        return new ResponseEntity<>(orders, HttpStatus.OK);
 //    }
 
-    @GetMapping
-    public ResponseEntity<List<Order>> getAllOrdersByUsername(@RequestHeader("Authorization") String token) {
-        try {
-            // Log token for debugging
-            log.info("Received Token: {}", token);
+    @GetMapping("all")
+    public ResponseEntity<List<Order>> getAllOrder() {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        List<String> authorization = httpHeaders.get("Authorization");
+        log.info("httpHeaders {},",httpHeaders);
+        log.info("auth header : {},", authorization);
 
-            if (userService.isUserLoggedIn(token)) {
+        List<Order> orders = orderService.getAllOrders();
+        log.info("Orders retrieved: {}", orders.size());
+
+        return ResponseEntity.ok(orders);
+    }
+
+
+@GetMapping
+public ResponseEntity<List<Order>> getAllOrdersByUsername(@RequestHeader("Authorization") String token) {
+    try {
+        // Log token for debugging
+        log.info("Received Token: {}", token);
+
+        if (userService.isUserLoggedIn(token)) {
 //                String username = userService.getUsernameFromToken(token);
 
-                List<Order> orders = orderService.getAllOrdersByUsername(token);
-                log.info("Orders retrieved: {}", orders.size());
+            List<Order> orders = orderService.getAllOrdersByUsername(token);
+            log.info("Orders retrieved: {}", orders.size());
 
-                return ResponseEntity.ok(orders);
-            } else {
-                log.info("User not logged in");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-            }
-        } catch (FeignException.Forbidden e) {
-            log.info("Forbidden Exception: {}", e.getMessage());
+            return ResponseEntity.ok(orders);
+        } else {
+            log.info("User not logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        } catch (Exception e) {
-            log.info("Error occurred: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    } catch (FeignException.Forbidden e) {
+        log.info("Forbidden Exception: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    } catch (Exception e) {
+        log.info("Error occurred: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+}
 
 //    @GetMapping("/{orderId}")
 //    public ResponseEntity<?> getOrderById(@PathVariable Long orderId, @RequestHeader("Authorization") String token) {
@@ -89,16 +104,16 @@ public class OrderController {
 //        }
 //    }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<?> getOrderById(@PathVariable Long orderId ) {
+@GetMapping("/{orderId}")
+public ResponseEntity<?> getOrderById(@PathVariable Long orderId) {
 //        try {
 //            if (userService.isUserLoggedIn(token)) {
-                Optional<Order> order = orderService.getOrderById(orderId);
-                if (order.isPresent()) {
-                    return ResponseEntity.ok(order.get());
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
-                }
+    Optional<Order> order = orderService.getOrderById(orderId);
+    if (order.isPresent()) {
+        return ResponseEntity.ok(order.get());
+    } else {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
+    }
 //            }
 //        else {
 //                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
@@ -107,80 +122,80 @@ public class OrderController {
 //            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access: Token invalid or expired");
 //        } catch (Exception e) {
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
-        }
+}
 //    }
 
 
-    @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order, @RequestHeader("Authorization") String token) throws ProductNotFoundException {
+@PostMapping
+public ResponseEntity<Order> createOrder(@RequestBody Order order, @RequestHeader("Authorization") String token) throws ProductNotFoundException {
 
-        try {
-            log.info("Received Token: {}", token);
+    try {
+        log.info("Received Token: {}", token);
 
-            if (userService.isUserLoggedIn(token)) {
-                Order createdOrder = orderService.placeOrder(order);
-                return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
-            } else {
-                log.info("User not logged in");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-            }
-        } catch (FeignException.Forbidden e) {
-            log.info("Forbidden Exception: {}", e.getMessage());
+        if (userService.isUserLoggedIn(token)) {
+            Order createdOrder = orderService.placeOrder(order);
+            return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
+        } else {
+            log.info("User not logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        } catch (Exception e) {
-            log.info("Error occurred: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    } catch (FeignException.Forbidden e) {
+        log.info("Forbidden Exception: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    } catch (Exception e) {
+        log.info("Error occurred: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    }
 
 //        Order createdOrder = orderService.createOrder(order);
 //        return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
-    }
+}
 
-    @PutMapping("/{orderId}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long orderId, @RequestBody Order updatedOrder, @RequestHeader("Authorization") String token) {
-        try {
-            log.info("Received Token: {}", token);
-            if (userService.isUserLoggedIn(token)) {
-                Order updated = orderService.updateOrder(orderId, updatedOrder);
-                if (updated != null) {
-                    return new ResponseEntity<>(updated, HttpStatus.CREATED);
-                } else {
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-
+@PutMapping("/{orderId}")
+public ResponseEntity<Order> updateOrder(@PathVariable Long orderId, @RequestBody Order updatedOrder, @RequestHeader("Authorization") String token) {
+    try {
+        log.info("Received Token: {}", token);
+        if (userService.isUserLoggedIn(token)) {
+            Order updated = orderService.updateOrder(orderId, updatedOrder);
+            if (updated != null) {
+                return new ResponseEntity<>(updated, HttpStatus.CREATED);
             } else {
-                log.info("User not logged in");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } catch (FeignException.Forbidden e) {
-            log.info("Forbidden Exception: {}", e.getMessage());
+
+        } else {
+            log.info("User not logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        } catch (Exception e) {
-            log.info("Error occurred: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
-
+    } catch (FeignException.Forbidden e) {
+        log.info("Forbidden Exception: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    } catch (Exception e) {
+        log.info("Error occurred: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
 
-    @PutMapping("/{orderId}/status")
-    public ResponseEntity<String> updateOrderStatus(@PathVariable Long orderId, @RequestBody String newStatus, @RequestHeader("Authorization") String token) {
-        try {
-            if (userService.isUserLoggedIn(token)) {
-                Order updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
-                if (updatedOrder != null) {
-                    return new ResponseEntity<>("Order status updated successfully", HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
-                }
+
+}
+
+@PutMapping("/{orderId}/status")
+public ResponseEntity<String> updateOrderStatus(@PathVariable Long orderId, @RequestBody String newStatus, @RequestHeader("Authorization") String token) {
+    try {
+        if (userService.isUserLoggedIn(token)) {
+            Order updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
+            if (updatedOrder != null) {
+                return new ResponseEntity<>("Order status updated successfully", HttpStatus.OK);
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
+                return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
             }
-        } catch (FeignException.Forbidden e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access: Token invalid or expired");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first");
         }
+    } catch (FeignException.Forbidden e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access: Token invalid or expired");
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request");
+    }
 
 
 //        Order updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
@@ -189,17 +204,17 @@ public class OrderController {
 //        } else {
 //            return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
 //        }
-    }
+}
 
-    @DeleteMapping("/{orderId}")
-    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId) {
-        boolean canceled = orderService.cancelOrder(orderId);
-        if (canceled) {
-            return new ResponseEntity<>("Order canceled successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Order not found or cannot be canceled", HttpStatus.NOT_FOUND);
-        }
+@DeleteMapping("/{orderId}")
+public ResponseEntity<String> cancelOrder(@PathVariable Long orderId) {
+    boolean canceled = orderService.cancelOrder(orderId);
+    if (canceled) {
+        return new ResponseEntity<>("Order canceled successfully", HttpStatus.OK);
+    } else {
+        return new ResponseEntity<>("Order not found or cannot be canceled", HttpStatus.NOT_FOUND);
     }
+}
 
 //    @GetMapping("/order-item/{orderId}/{productId}")
 //    public Order addItemToOrder(@PathVariable Long orderId, @PathVariable Long productId, Double quantity) throws ProductNotFoundException {
@@ -225,30 +240,30 @@ public class OrderController {
 //        return orderRepository.save(order);
 //    }
 
-    @GetMapping("/logged/orders")
-    public ResponseEntity<List<Order>> getOrdersByLoggedInUser(@RequestHeader("Authorization") String token) {
-        try {
+@GetMapping("/logged/orders")
+public ResponseEntity<List<Order>> getOrdersByLoggedInUser(@RequestHeader("Authorization") String token) {
+    try {
 
-            if (userService.isUserLoggedIn(token)) {
-                String username = userService.getUsernameFromToken(token);
-                log.info("Extracted Username: {}",username);
+        if (userService.isUserLoggedIn(token)) {
+            String username = userService.getUsernameFromToken(token);
+            log.info("Extracted Username: {}", username);
 
-                List<Order> orders = orderService.getOrdersByUsername(username);
-                log.info("Orders retrieved: {}", orders.size());
+            List<Order> orders = orderService.getOrdersByUsername(username);
+            log.info("Orders retrieved: {}", orders.size());
 
-                return ResponseEntity.ok(orders);
-            } else {
-                System.out.println("User not logged in");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-            }
-        } catch (FeignException.Forbidden e) {
-            log.info("Forbidden Exception:{} ",  e.getMessage());
+            return ResponseEntity.ok(orders);
+        } else {
+            System.out.println("User not logged in");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        } catch (Exception e) {
-            log.info("Error occurred: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    } catch (FeignException.Forbidden e) {
+        log.info("Forbidden Exception:{} ", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    } catch (Exception e) {
+        log.info("Error occurred: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+}
 
 
 }

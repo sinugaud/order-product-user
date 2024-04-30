@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+
 @Log4j2
 @Component
 public class ProductFallbackService implements ProductClient {
@@ -19,12 +20,14 @@ public class ProductFallbackService implements ProductClient {
         return Collections.emptyList();
     }
 
+
+
     @Override
     public Product getProductById(Long id) {
-log.info("fallback method product id");
+        log.info("fallback method product id");
 
-        // Return a default product or handle the failure differently
-        return new Product(id, "Unavailable Product");
+//         Return a default product or handle the failure differently
+        return new Product(id, "unavailableProduct");
     }
 
     @Override

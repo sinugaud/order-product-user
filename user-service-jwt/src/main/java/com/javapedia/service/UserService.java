@@ -1,13 +1,23 @@
 package com.javapedia.service;
 
-import com.javapedia.entity.AuthRequest;
-import com.javapedia.entity.UserInfo;
+import com.javapedia.entity.User;
 
-public interface UserService  {
-     String addNewUser(UserInfo userInfo) ;
+import java.security.Principal;
+import java.util.Optional;
 
-        String authenticateAndGetToken(AuthRequest authRequest) throws Exception;
+public interface UserService {
+    String addNewUser(User userInfo);
+
+//    String authenticateAndGetToken(AuthDTO.LoginRequest authRequest) throws Exception;
+
     Boolean isTokenValid(String jwtToken);
+
     String logout(String jwtToken);
+
     String getUsernameFromToken(String jwtToken);
+     Optional<User> getUserDetails(Principal principal) ;
+
+
+//    UserInfo getUserProfile(String username);
+
 }

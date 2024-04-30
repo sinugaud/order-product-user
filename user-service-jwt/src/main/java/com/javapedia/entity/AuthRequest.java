@@ -1,15 +1,15 @@
-package com.javapedia.entity;
-
-import lombok.AllArgsConstructor;
-import lombok.Data; 
-import lombok.NoArgsConstructor; 
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class AuthRequest { 
-
-	private String username; 
-	private String password; 
-
-}
+//package com.javapedia.entity;
+//
+//import lombok.AllArgsConstructor;
+//import lombok.Data;
+//import lombok.NoArgsConstructor;
+//
+//@Data
+//@AllArgsConstructor
+//@NoArgsConstructor
+//public class AuthRequest {
+//
+//	private String username;
+//	private String password;
+//
+//}

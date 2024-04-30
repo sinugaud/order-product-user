@@ -10,10 +10,10 @@ import lombok.Data;
 @Data
 public class Product {
     private Long id;
-    private String name;
+    private String name ;
     private String description;
     private double price;
-    private Long cartId;
+//    private Long cartId.;
 
     public Product(Long id, String unavailableProduct) {
     }
