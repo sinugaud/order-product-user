@@ -3,7 +3,7 @@
 //import com.javapedia.entity.AuthRequest;
 //import com.javapedia.entity.UserInfo;
 //import com.javapedia.service.JwtService;
-//import com.javapedia.service.UserInfoService;
+//import com.javapedia.service.impl.UserInfoService;
 //import lombok.extern.log4j.Log4j2;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.http.HttpStatus;

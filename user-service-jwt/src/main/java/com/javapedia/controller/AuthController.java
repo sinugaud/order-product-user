@@ -4,7 +4,7 @@ import com.javapedia.dto.AuthDTO;
 import com.javapedia.dto.AuthUser;
 import com.javapedia.entity.User;
 import com.javapedia.fillter.AuthService;
-import com.javapedia.service.UserInfoService;
+import com.javapedia.service.impl.UserInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")

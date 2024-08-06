@@ -8,24 +8,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 //@FeignClient(value = "product-service", url = "http://localhost:8082/api/products/" ,fallback = ProductFallbackService.class)
-@FeignClient(value = "PRODUCT-SERVICE",fallback = ProductFallbackService.class)
-
+@FeignClient(value = "PRODUCT-SERVICE/api/products/",fallback = ProductFallbackService.class  )
 public interface ProductClient {
 
-    @GetMapping
-    public List<Product> getAllProducts();
+    @GetMapping()
+     List<Product> getAllProducts();
 
 
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id);
+     Product getProductById(@PathVariable Long id);
 
 
-    @PostMapping
-    public Product createProduct(@RequestBody Product product);
+//    @PostMapping
+//     Product createProduct(@RequestBody Product product);
 
 
     @DeleteMapping("/{id}")
-    public String deleteProductById(@PathVariable Long id);
+     String deleteProductById(@PathVariable Long id);
 
 
 }

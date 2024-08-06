@@ -3,14 +3,12 @@ package com.javapedia.service.impl;
 import com.javapedia.entity.User;
 import com.javapedia.fillter.AuthService;
 import com.javapedia.repository.UserInfoRepository;
-import com.javapedia.service.UserInfoService;
 import com.javapedia.service.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.security.Principal;
 import java.util.HashSet;

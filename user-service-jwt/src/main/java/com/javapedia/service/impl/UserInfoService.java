@@ -1,4 +1,4 @@
-package com.javapedia.service;
+package com.javapedia.service.impl;
 
 import com.javapedia.dto.AuthUser;
 import com.javapedia.entity.User;
