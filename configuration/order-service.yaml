@@ -7,7 +7,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    open-in-view: disable
+    open-in-view: false
   cloud:
     discovery:
       client:
