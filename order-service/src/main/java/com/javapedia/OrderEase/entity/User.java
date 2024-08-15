@@ -1,4 +1,4 @@
-package com.javapedia.OrderEase.model;
+package com.javapedia.OrderEase.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,17 +9,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Cart {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String productId;
-    private String quantity;
-    private String price;
-//    private String username;
 
-;}
+    private String userId;
+
+    private String username;
+
+    private String email;
+}

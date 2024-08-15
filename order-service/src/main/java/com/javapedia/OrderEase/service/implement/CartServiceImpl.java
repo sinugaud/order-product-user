@@ -1,6 +1,6 @@
 package com.javapedia.OrderEase.service.implement;
 
-import com.javapedia.OrderEase.model.Cart;
+import com.javapedia.OrderEase.entity.Cart;
 import com.javapedia.OrderEase.repository.OrderCartRepository;
 import com.javapedia.OrderEase.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;

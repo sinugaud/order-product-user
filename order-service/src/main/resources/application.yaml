@@ -1,0 +1,21 @@
+
+spring:
+  application:
+    name: ORDER-SERVICE
+  config:
+    import: optional:configserver:http://localhost:8086
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

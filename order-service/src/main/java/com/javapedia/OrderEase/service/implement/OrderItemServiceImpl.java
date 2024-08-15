@@ -1,8 +1,8 @@
 package com.javapedia.OrderEase.service.implement;
 
-import com.javapedia.OrderEase.controller.OrderItemNotFoundException;
+import com.javapedia.OrderEase.exeption.OrderItemNotFoundException;
 import com.javapedia.OrderEase.dto.Product;
-import com.javapedia.OrderEase.model.OrderItem;
+import com.javapedia.OrderEase.entity.OrderItem;
 import com.javapedia.OrderEase.repository.OrderItemRepository;
 import com.javapedia.OrderEase.service.OrderItemService;
 import com.javapedia.OrderEase.service.productdelegate.ProductServiceDelegate;

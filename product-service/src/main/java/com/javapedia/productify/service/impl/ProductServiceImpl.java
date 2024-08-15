@@ -36,13 +36,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "products")
+    @Cacheable(value = "productsCache")
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
     @Override
-    @Cacheable(value = "products", key = "#id")
+    @Cacheable(value = "productsCache", key = "#id")
 
     public Product getProductById(Long id) {
         return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + id));
@@ -50,14 +50,14 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    @CachePut(value = "products", key = "#id")
+    @CachePut(value = "productsCache", key = "#id")
 
     public Product addProduct(Product product) throws OrderItemNotFoundException {
         return productRepository.save(product);
     }
 
     @Override
-    @CacheEvict(value = "products", key = "#id")
+    @CacheEvict(value = "productsCache", key = "#id")
     public void deleteProductById(Long id) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow();
@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(existingProduct);
     }
 
-    @CachePut(value = "products", key = "#product.id")
+    @CachePut(value = "productsCache", key = "#product.id")
     public Product updateProduct(Product product, Long id) {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));

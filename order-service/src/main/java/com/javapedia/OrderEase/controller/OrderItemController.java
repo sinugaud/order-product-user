@@ -1,6 +1,7 @@
 package com.javapedia.OrderEase.controller;
 
-import com.javapedia.OrderEase.model.OrderItem;
+import com.javapedia.OrderEase.exeption.OrderItemNotFoundException;
+import com.javapedia.OrderEase.entity.OrderItem;
 import com.javapedia.OrderEase.service.OrderItemService;
 import com.javapedia.OrderEase.service.implement.ProductNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

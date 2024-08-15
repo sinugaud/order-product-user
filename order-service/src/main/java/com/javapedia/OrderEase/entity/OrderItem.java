@@ -1,4 +1,4 @@
-package com.javapedia.OrderEase.model;
+package com.javapedia.OrderEase.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

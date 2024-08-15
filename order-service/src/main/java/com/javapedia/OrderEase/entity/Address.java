@@ -1,4 +1,4 @@
-package com.javapedia.OrderEase.model;
+package com.javapedia.OrderEase.entity;
 
 import com.javapedia.OrderEase.Enum.AddressType;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.javapedia;
+package com.javapedia.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

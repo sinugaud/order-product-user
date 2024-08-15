@@ -1,4 +1,4 @@
-package com.javapedia.OrderEase.model;
+package com.javapedia.OrderEase.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.javapedia.OrderEase.Enum.OrderStatus;
@@ -31,4 +31,5 @@ public class Order  implements Serializable {
     private double totalAmount;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
+
 }

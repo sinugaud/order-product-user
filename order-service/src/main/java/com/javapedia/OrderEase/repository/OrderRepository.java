@@ -1,6 +1,6 @@
 package com.javapedia.OrderEase.repository;
 
-import com.javapedia.OrderEase.model.Order;
+import com.javapedia.OrderEase.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

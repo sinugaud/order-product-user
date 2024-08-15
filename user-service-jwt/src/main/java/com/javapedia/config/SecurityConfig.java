@@ -1,14 +1,14 @@
 package com.javapedia.config;
 
-import com.javapedia.service.impl.UserInfoService;
+import com.javapedia.fillter.JwtTokenFilter;
+import com.javapedia.security.CustomJwtGrantedAuthoritiesConverter;
+import com.javapedia.service.impl.UserDetailsServicesImpl;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +27,12 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -36,45 +40,83 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 public class SecurityConfig {
 
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
     @Autowired
     private RsaKeyConfigProperties rsaKeyConfigProperties;
     @Autowired
-    private UserInfoService userDetailsService;
+    private UserDetailsServicesImpl userDetailsService;
 
+    private JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    @Bean
-    public AuthenticationManager authManager() {
-
-        var authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return new ProviderManager(authProvider);
+    @Autowired
+    public SecurityConfig(
+            RsaKeyConfigProperties rsaKeyConfigProperties,
+            UserDetailsServicesImpl userDetailsService,
+            JwtTokenFilter jwtTokenFilter ) {
+        this.rsaKeyConfigProperties = rsaKeyConfigProperties;
+        this.userDetailsService = userDetailsService;
+        this.jwtTokenFilter = jwtTokenFilter;
+        this.passwordEncoder = passwordEncoder;
     }
 
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
+                new CustomJwtGrantedAuthoritiesConverter());
+        return jwtAuthenticationConverter;
+    }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-//                .cors(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/USER-SERVICE/**").authenticated();
-                    auth.requestMatchers("/error/**").permitAll();
-                    auth.requestMatchers("/api/auth/**").permitAll();
-                    auth.requestMatchers("api/auth/sign-up").permitAll();
-                    auth.requestMatchers("/USER-SERVICE/api/auth/login").permitAll();
-                    auth.requestMatchers("/USER-SERVICE/api/auth/sign-up").permitAll();
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(
+                        auth -> {
+                            auth.requestMatchers("/error/**").permitAll();
+                            auth.requestMatchers("/api/auth/**").permitAll();
+                            auth.requestMatchers(
+                                            "/swagger-ui.html/**", "/api-docs", "/swagger-ui/**", "/v3/api-docs/**")
+                                    .permitAll();
 
-                    ;
-                    auth.anyRequest().authenticated();
-                })
+                            auth.anyRequest().authenticated();
+                        })
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt((jwt) -> jwt.decoder(jwtDecoder())))
+                .oauth2ResourceServer(
+                        (oauth2) ->
+                                oauth2.jwt(
+                                        (jwt) ->
+                                                jwt.decoder(jwtDecoder())
+                                                        .jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .userDetailsService(userDetailsService)
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults())
                 .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.addExposedHeader("xsrf-token");
+        configuration.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+
+        return new ProviderManager(daoAuthenticationProvider);
     }
 
     @Bean
@@ -84,91 +126,19 @@ public class SecurityConfig {
 
     @Bean
     JwtEncoder jwtEncoder() {
-        JWK jwk = new RSAKey.Builder(rsaKeyConfigProperties.publicKey()).privateKey(rsaKeyConfigProperties.privateKey()).build();
+        JWK jwk =
+                new RSAKey.Builder(rsaKeyConfigProperties.publicKey())
+                        .privateKey(rsaKeyConfigProperties.privateKey())
+                        .build();
 
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-
-
-
-
-    //dsfghjgfd
-
-//    @Autowired
-//    private JwtAuthFilter authFilter;
 //    @Bean
-//    CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(List.of("*"));
-//        configuration.setAllowedMethods(List.of("*"));
-//        configuration.setAllowedHeaders(List.of("*"));
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
-//
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        return new UserInfoService();
-//    }
-//
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//
-//        http.csrf(AbstractHttpConfigurer::disable).cors(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(req ->
-//                        req.requestMatchers("/welcome","/token/validate", "/sign-up", "/login","/auth/logout","/logged/username").permitAll().
-//                                requestMatchers("/user/**").authenticated().
-//                                requestMatchers("/admin/**").authenticated());
-//        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authenticationProvider(authenticationProvider())
-//                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
-//
-//
-//        return http.build();
-//    }
-//
-//    // Password Encoding
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
+//    PasswordEncoder passwordEncoder() {
 //        return new BCryptPasswordEncoder();
-//    }
 //
-//    @Bean
-//    public AuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-//        authenticationProvider.setUserDetailsService(userDetailsService());
-//        authenticationProvider.setPasswordEncoder(passwordEncoder());
-//        return authenticationProvider;
-//    }
-//
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-//        return config.getAuthenticationManager();
 //    }
 }
-
-
-//		return http.csrf().disable()
-//				.authorizeHttpRequests()
-//				.requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken").permitAll()
-//				.and()
-//				.authorizeHttpRequests().requestMatchers("/auth/user/**").authenticated()
-//				.and()
-//				.authorizeHttpRequests().requestMatchers("/auth/admin/**").authenticated()
-//				.and()
-//				.sessionManagement()
-//				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//				.and()
-//				.authenticationProvider(authenticationProvider())
-//				.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
-//				.build();
-
 

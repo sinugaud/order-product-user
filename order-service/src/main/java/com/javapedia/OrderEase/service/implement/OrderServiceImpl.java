@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javapedia.OrderEase.Enum.OrderStatus;
 import com.javapedia.OrderEase.dto.OrderPlacedEventDTO;
-import com.javapedia.OrderEase.model.Order;
-import com.javapedia.OrderEase.model.OrderItem;
+import com.javapedia.OrderEase.dto.Orders;
+import com.javapedia.OrderEase.dto.Product;
+import com.javapedia.OrderEase.entity.Order;
+import com.javapedia.OrderEase.entity.OrderItem;
 import com.javapedia.OrderEase.repository.OrderItemRepository;
 import com.javapedia.OrderEase.repository.OrderRepository;
 import com.javapedia.OrderEase.service.OrderService;
-import com.javapedia.OrderEase.service.UserService;
 import com.javapedia.OrderEase.service.productdelegate.ProductServiceDelegate;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.core.Message;
@@ -18,8 +19,10 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -28,8 +31,6 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private ProductServiceDelegate productServiceDelegate;
-    @Autowired
-    private UserService userService;
     @Autowired
     private OrderItemRepository orderItemRepository;
     @Autowired
@@ -40,7 +41,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getOrdersByUsername(String username) {
-//        System.out.println("Token in side method"+token);
 
 //        String usernameFromToken = userService.getUsernameFromToken(token);
 
@@ -50,8 +50,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getAllOrdersByUsername(String token) {
-        String username = userService.getUsernameFromToken(token);
-        return orderRepository.findAllByUsername(username);
+//        String username = userService.getUsernameFromToken(token);
+//        return orderRepository.findAllByUsername(username);
+        return new ArrayList<Order>();
 
     }
 
@@ -109,9 +110,17 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public List<Orders> getAllOrders() {
+        List<Orders> ordersList = new ArrayList<>();
+        List<Order> orders = orderRepository.findAll();
 
+        for (Order order : orders) {
+            List<Product> products = order.getOrderItems().stream().map(orderItem -> productServiceDelegate.getProductById(orderItem.getProductId())).collect(Collectors.toList());
+            ordersList.add(new Orders(order, products));
+
+        }
+
+        return ordersList;
     }
 
 

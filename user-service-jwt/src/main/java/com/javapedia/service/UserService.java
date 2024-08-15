@@ -6,18 +6,14 @@ import java.security.Principal;
 import java.util.Optional;
 
 public interface UserService {
-    String addNewUser(User userInfo);
+    String addNewUser(User user);
 
-//    String authenticateAndGetToken(AuthDTO.LoginRequest authRequest) throws Exception;
+    String updateProfile(String userId, User user);
 
-    Boolean isTokenValid(String jwtToken);
+    Optional<User> getUserDetails(Principal principal);
 
-    String logout(String jwtToken);
+    String deleteUser(String userId);
 
-    String getUsernameFromToken(String jwtToken);
-     Optional<User> getUserDetails(Principal principal) ;
-
-
-//    UserInfo getUserProfile(String username);
+    String updatePassword(String id, String password);
 
 }

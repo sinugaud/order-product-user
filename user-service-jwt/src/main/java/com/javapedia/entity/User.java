@@ -36,7 +36,7 @@ public class User {
 
     @NonNull
     private String roles;
-    private Byte displayPicture;
+//    private Byte displayPicture;
 
 
 }

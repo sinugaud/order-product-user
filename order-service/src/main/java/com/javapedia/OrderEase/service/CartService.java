@@ -1,6 +1,6 @@
 package com.javapedia.OrderEase.service;
 
-import com.javapedia.OrderEase.model.Cart;
+import com.javapedia.OrderEase.entity.Cart;
 
 import java.util.List;
 

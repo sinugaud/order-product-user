@@ -1,6 +1,7 @@
 package com.javapedia.OrderEase.service;
 
-import com.javapedia.OrderEase.model.Order;
+import com.javapedia.OrderEase.dto.Orders;
+import com.javapedia.OrderEase.entity.Order;
 import com.javapedia.OrderEase.service.implement.ProductNotFoundException;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public interface OrderService {
     List<Order> getAllOrdersByUsername(String token);
 
 
-    List<Order> getAllOrders();
+    List<Orders> getAllOrders();
 
     Optional<Order> getOrderById(Long orderId);
 
