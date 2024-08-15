@@ -25,10 +25,10 @@ spring:
         service-url:
         defaultZone: http://localhost:8761/
   rabbitmq:
-    host: localhost
-    username: guest
-    password: guest
-    port: 5672
+    host: puffin-01.rmq2.cloudamqp.com
+    username: ptuqvtbo
+    password: Fb6o-EYlXyBLxp8q39jh-S0regGbqhl6
+    port: 5671
 server:
   port: 8082
 
