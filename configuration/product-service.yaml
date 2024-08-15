@@ -8,6 +8,17 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
+  cache:
+    type: redis
+  data:
+    redis:
+      database: 0
+      host: redis-19556.c309.us-east-2-1.ec2.redns.redis-cloud.com
+      port: 19556
+      username: default
+      password: sinugaud
+      timeout: 6000
+
   cloud:
     discovery:
       client:
@@ -20,6 +31,7 @@ spring:
     port: 5672
 server:
   port: 8081
+
 
 
 
