@@ -3,11 +3,11 @@ package com.javapedia.productify.client;
 import com.javapedia.productify.dto.OrderItemDto;
 import com.javapedia.productify.exeptions.OrderItemNotFoundException;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 //@FeignClient(value = "order-service", url = "http://localhost:8081/order-items")
-@FeignClient(name = "order-service")
+ @FeignClient(name = "order-service")
 
 public interface OrderItemClient {
 

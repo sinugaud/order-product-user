@@ -1,4 +1,4 @@
-package com.javapedia.productify.service.impl;
+package com.javapedia.productify.exeptions;
 
 public class InsufficientProductQuantityException extends Throwable {
     public InsufficientProductQuantityException(String s) {

@@ -2,12 +2,11 @@ package com.javapedia.productify.client;
 
 import com.javapedia.productify.dto.OrderDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "ORDER-SERVICE")
+ @FeignClient(name = "ORDER-SERVICE")
 public interface OrderServiceClient {
 
 

@@ -3,7 +3,7 @@ package com.javapedia.productify.listenerr;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javapedia.productify.dto.OrderPlacedEventDTO;
 import com.javapedia.productify.service.ProductService;
-import com.javapedia.productify.service.impl.InsufficientProductQuantityException;
+import com.javapedia.productify.exeptions.InsufficientProductQuantityException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
