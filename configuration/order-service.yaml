@@ -7,6 +7,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    open-in-view: disable
   cloud:
     discovery:
       client:
@@ -19,5 +20,11 @@ spring:
     port: 5672
 server:
   port: 8081
+
+
+
+
+
+
 
 
