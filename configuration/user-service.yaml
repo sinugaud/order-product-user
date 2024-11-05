@@ -9,6 +9,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+      dialect: MySQL8Dialect
+
     open-in-view: false
   cloud:
     discovery:
