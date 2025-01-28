@@ -14,10 +14,10 @@ spring:
         service-url:
         defaultZone: http://localhost:8761/
   rabbitmq:
-    virtualHost: ptuqvtbo
-    host: puffin.rmq2.cloudamqp.com
-    username: ptuqvtbo
-    password: Fb6o-EYlXyBLxp8q39jh-S0regGbqhl6
+    virtualHost: wwwbjske
+    host: dog-01.lmq.cloudamqp.com
+    username: wwwbjske
+    password: YB-I9mXxL-wmvDZ7EaxYJb4yuNj630Zk
     port: 5672
 server:
   port: 8081
